@@ -1,4 +1,4 @@
-# Spectra C2 — Command & Control Framework
+# Spectra C2 - Command & Control Framework
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)
@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Educational Project](https://img.shields.io/badge/Purpose-Educational-red)
 
-A lightweight Command & Control framework built for educational purposes. Spectra C2 provides a TLS-encrypted reverse shell with session management, file transfer capabilities, automatic persistence, and an obfuscated dropper — designed to demonstrate real-world offensive security techniques in a controlled lab environment.
+A lightweight Command & Control framework built for educational purposes. Spectra C2 provides a TLS-encrypted reverse shell with session management, file transfer capabilities, automatic persistence, and an obfuscated dropper - designed to demonstrate real-world offensive security techniques in a controlled lab environment.
 
 > **Disclaimer:** This project is intended exclusively for educational and authorized security research purposes. Unauthorized use against systems you do not own or have explicit permission to test is illegal and unethical.
 
@@ -28,10 +28,10 @@ The framework consists of three components that operate in distinct phases:
        |                    downloads and                    |
        |                    executes agent                   |
        |                          |                          |
-       |                          | --- TLS (port 443) -->   |
-       |                          |     passphrase           |
-       |                          | <--- commands ---        |
-       |                          | --- responses --->       |
+       |                          | ---- TLS (port 443) ---> |
+       |                          |        passphrase        |
+       |                          | <------ commands ------- |
+       |                          | ------ responses ------> |
 ```
 
 1. The **C2 server** starts on the attacker's Linux machine, listening for TLS connections
