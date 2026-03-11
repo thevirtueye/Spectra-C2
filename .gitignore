@@ -1,0 +1,8 @@
+config.json
+server.key
+server.crt
+exe/
+downloads/
+uploads/
+__pycache__/
+*.pyc

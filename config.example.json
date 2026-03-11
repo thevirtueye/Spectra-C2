@@ -1,0 +1,5 @@
+{
+    "host": "YOUR_IP_HERE",
+    "port": 443,
+    "passphrase_hash": "YOUR_PASSPHRASE_SHA256_HASH_HERE"
+}
