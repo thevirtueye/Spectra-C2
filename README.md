@@ -309,6 +309,7 @@ This framework implements the following security measures, applied incrementally
 | Rate Limiting | After 3 failed authentication attempts from the same IP, connections are rejected for 60 seconds |
 | External Configuration | Sensitive server parameters are stored in `config.json` |
 | Port 443 | C2 traffic uses the standard HTTPS port to blend with normal web traffic |
+| File Integrity | All file transfers (upload/download) are verified using SHA256 hash comparison to ensure data integrity |
 
 ---
 

